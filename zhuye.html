@@ -1,0 +1,265 @@
+<!DOCTYPE html>
+<html>
+<head includeDefault="true">
+  <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>谢宁的个人网站</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+  </style>
+  <script src="./ThreeJs/js/jquery-1.11.0.min.js"></script>
+  <link rel="stylesheet" href="./layui/css/layui.css">
+  <script src="./layui/layui.js"></script>
+  <script src="./echarts/echarts.min.js"></script>
+</head>
+
+<body class="layui-layout-body">
+<div class="layui-layout layui-layout-admin">
+  <div class="layui-header">
+    <div class="layui-logo">谢宁的个人网站</div>
+    <!-- 头部区域（可配合layui已有的水平导航） -->
+    <ul class="layui-nav layui-layout-left">
+      <li class="layui-nav-item"><a href="zhuye.html">首页</a></li>
+      <li class="layui-nav-item"><a href="">个人日记</a></li>
+      <li class="layui-nav-item">
+        <a href="javascript:;">ThreeJs</a>
+        <dl class="layui-nav-child">
+          <dd><a href="https://blog.csdn.net/homula123" target="view_window">我的CSDN文章</a></dd>
+          <dd><a href="3DProject.html" target="view_window">3D库图演示实例</a></dd>
+        </dl>
+      </li>
+    </ul>
+    <ul class="layui-nav layui-layout-right">
+      <li class="layui-nav-item">
+        <a href="javascript:;">
+          <img src="http://t.cn/RCzsdCq" class="layui-nav-img">
+          谢宁
+        </a>
+        <dl class="layui-nav-child">
+          <dd><a href="">基本资料</a></dd>
+          <dd><a href="">安全设置</a></dd>
+        </dl>
+      </li>
+      <li class="layui-nav-item"><a href="">退出</a></li>
+    </ul>
+  </div>
+
+  <div class="layui-side layui-bg-black">
+    <div class="layui-side-scroll">
+      <!-- 左侧导航区域（可配合layui已有的垂直导航） -->
+      <ul class="layui-nav layui-nav-tree"  lay-filter="test">
+        <li class="layui-nav-item"><a href="zhuye.html">首页</a></li>
+        <li class="layui-nav-item"><a href="">个人日记</a></li>
+        <li class="layui-nav-item layui-nav-itemed">
+          <a class="" href="javascript:;">ThreeJs</a>
+          <dl class="layui-nav-child">
+            <dd><a href="https://blog.csdn.net/homula123" target="view_window">我的CSDN文章</a></dd>
+            <dd><a href="3DProject.html" target="view_window">3D库图演示实例</a></dd>
+          </dl>
+        </li>
+      </ul>
+    </div>
+  </div>
+
+  <div class="layui-body">
+    <!-- 内容主体区域 -->
+    <div style="padding: 20px; background-color: #F2F2F2;">
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">快捷方式</div>
+          <div class="layui-card-body">
+            卡片式面板面板通常用于非白色背景色的主体内<br>
+            从而映衬出边框投影
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">代办事项</div>
+          <div class="layui-card-body">
+            卡片式面板面板通常用于非白色背景色的主体内<br>
+            从而映衬出边框投影
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">版本信息</div>
+          <div class="layui-card-body">
+            卡片式面板面板通常用于非白色背景色的主体内<br>
+            从而映衬出边框投影
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+        <div class="layui-card">
+          <div class="layui-card-header">首页轮播</div>
+          <div class="layui-card-body">
+            <div class="layui-carousel" id="test1">
+            <div carousel-item>
+              <div style="text-align:center"><img src="./images/lunbo1.jpg"></div>
+              <div style="text-align:center"><img src="./images/lunbo2.jpg"></div>
+              <div style="text-align:center"><img src="./images/lunbo3.jpg"></div>
+            </div>
+          </div>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">效果报告</div>
+          <div class="layui-card-body">
+            20%
+            <div class="layui-progress layui-progress-big" lay-showPercent="true">
+              <div class="layui-progress-bar" lay-percent="20%"></div>
+            </div>
+            <br>
+            50%
+            <div class="layui-progress layui-progress-big" lay-showPercent="true">
+              <div class="layui-progress-bar layui-bg-orange" lay-percent="50%"></div>
+            </div>
+            <br>
+            80%
+            <div class="layui-progress layui-progress-big" lay-showPercent="true">
+              <div class="layui-progress-bar layui-bg-blue" lay-percent="80%"></div>
+            </div>
+            <br>
+            80%
+            <div class="layui-progress layui-progress-big" lay-showPercent="true">
+              <div class="layui-progress-bar layui-bg-blue" lay-percent="80%"></div>
+            </div>
+            <br><br>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="layui-row layui-col-space15">
+      <div class="layui-col-xs8 layui-col-sm8 layui-col-md8">
+        <div class="layui-card">
+          <div class="layui-card-header">数据概览</div>
+          <div class="layui-card-body">
+            <div id="main" style="width: 100%;height:400px;"></div>
+          </div>
+        </div>
+      </div>
+      <div class="layui-col-xs4 layui-col-sm4 layui-col-md4">
+        <div class="layui-card">
+          <div class="layui-card-header">作者介绍</div>
+          <div class="layui-card-body">
+            大家好！我是谢宁
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+  <div class="layui-footer">
+    <!-- 底部固定区域 -->
+    © www.yuyaowujin.com - 联系方式：18302128586
+  </div>
+</div>
+<script>
+//JavaScript代码区域
+layui.use('element', function(){
+  var element = layui.element;
+
+});
+
+layui.use('carousel', function(){
+  var carousel = layui.carousel;
+  //建造实例
+  carousel.render({
+    elem: '#test1'
+    ,width: '100%' //设置容器宽度
+    ,height: '290px'
+    ,arrow: 'always' //始终显示箭头
+  });
+});
+
+// 基于准备好的dom，初始化echarts实例
+var myChart = echarts.init(document.getElementById('main'), 'light');
+
+// 指定图表的配置项和数据
+var option = {
+    title : {
+        text: '某地区蒸发量和降水量',
+        subtext: '纯属虚构'
+    },
+    tooltip : {
+        trigger: 'axis'
+    },
+    legend: {
+        data:['蒸发量','降水量']
+    },
+    toolbox: {
+        show : true,
+        feature : {
+            dataView : {show: true, readOnly: false},
+            magicType : {show: true, type: ['line', 'bar']},
+            restore : {show: true},
+            saveAsImage : {show: true}
+        }
+    },
+    calculable : true,
+    xAxis : [
+        {
+            type : 'category',
+            data : ['1月','2月','3月','4月','5月','6月','7月','8月','9月','10月','11月','12月']
+        }
+    ],
+    yAxis : [
+        {
+            type : 'value'
+        }
+    ],
+    series : [
+        {
+            name:'蒸发量',
+            type:'bar',
+            data:[2.0, 4.9, 7.0, 23.2, 25.6, 76.7, 135.6, 162.2, 32.6, 20.0, 6.4, 3.3],
+            markPoint : {
+                data : [
+                    {type : 'max', name: '最大值'},
+                    {type : 'min', name: '最小值'}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name: '平均值'}
+                ]
+            }
+        },
+        {
+            name:'降水量',
+            type:'bar',
+            data:[2.6, 5.9, 9.0, 26.4, 28.7, 70.7, 175.6, 182.2, 48.7, 18.8, 6.0, 2.3],
+            markPoint : {
+                data : [
+                    {name : '年最高', value : 182.2, xAxis: 7, yAxis: 183},
+                    {name : '年最低', value : 2.3, xAxis: 11, yAxis: 3}
+                ]
+            },
+            markLine : {
+                data : [
+                    {type : 'average', name : '平均值'}
+                ]
+            }
+        }
+    ]
+};
+
+// 使用刚指定的配置项和数据显示图表。
+myChart.setOption(option);
+</script>
+</body>
+
+</html>

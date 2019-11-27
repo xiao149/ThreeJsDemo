@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>实时全景监控</title>
+    <meta charset="utf-8" />
+    <meta
+            name="viewport"
+            content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0"
+    />
+    <style>
+        body {
+            background-color: #000000;
+            margin: 0px;
+            overflow: hidden;
+        }
+        #my-video {
+            position: fixed;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+        }
+    </style>
+    <link href="https://vjs.zencdn.net/7.5.4/video-js.css" rel="stylesheet"/>
+    <script src="https://vjs.zencdn.net/7.5.4/video.js"></script>
+    <script src="./ThreeJs/js/three.js"></script>
+</head>
+<body>
+<video id="my-video" class="video-js" controls preload="auto" autoplay loop data-setup="{}" crossorigin="anonymous">
+    <source src="./video/movie.mp4"/>
+</video>
+</body>
+</html>

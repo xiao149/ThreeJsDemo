@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html>
+
+<head includeDefault="true">
+  <meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+  <title>位置移动</title>
+  <style>
+    body {
+      margin: 0;
+      overflow: hidden;
+    }
+
+    #label {
+      position: absolute;
+      padding: 10px;
+      background: rgba(255, 255, 255, 0.6);
+      line-height: 1;
+      border-radius: 5px;
+    }
+  </style>
+  <script src="./ThreeJs/js/three.js"></script>
+  <script src="./ThreeJs/js/stats.min.js"></script>
+  <script src="./ThreeJs/js/DragControls.js"></script>
+  <script src="./ThreeJs/js/OrbitControls.js"></script>
+  <script src="./ThreeJs/js/dat.gui.min.js"></script>
+  <script src="./ThreeJs/js/EffectComposer.js"></script>
+  <script src="./ThreeJs/js/RenderPass.js"></script>
+  <script src="./ThreeJs/js/OutlinePass.js"></script>
+  <script src="./ThreeJs/js/FXAAShader.js"></script>
+  <script src="./ThreeJs/js/CopyShader.js"></script>
+  <script src="./ThreeJs/js/ShaderPass.js"></script>
+  <script src="./ThreeJs/js/ThreeBSP.js"></script>
+  <script src="./ThreeJs/ThreeJs_Drag.js"></script>
+  <script src="./ThreeJs/ThreeJs_Composer.js"></script>
+  <script src="./ThreeJs/Modules.js"></script>
+  <script src="./ThreeJs/js/jquery-1.11.0.min.js"></script>
+</head>
+
+<body>
+  <div id="label"></div>
+  <div id="container"></div>
+  <script>
+      var stats = initStats();
+      var camera, scene, renderer, controls, composer, transformControls, options;
+			var mouse, raycaster;
+			var rollOverMesh, rollOverMaterial;
+			var cubeGeo, cubeMaterial;
+			var objects = [];
+      var floor, gridHelper;
+      var selectobject = [];
+			init();
+			animate();
+
+      // 初始化场景
+      function initScene() {
+        scene = new THREE.Scene();
+        scene.background = new THREE.Color( 0xf0f0f0 );
+        scene.fog = new THREE.Fog(scene.background, 3000, 5000);
+      }
+
+      // 初始化相机
+      function initCamera() {
+        camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
+        camera.position.set(0, 800, 1500);
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+      }
+
+      // 初始化灯光
+      function initLight() {
+        var directionalLight = new THREE.DirectionalLight(0xffffff, 0.3); //模拟远处类似太阳的光源
+        directionalLight.color.setHSL(0.1, 1, 0.95);
+        directionalLight.position.set(0, 200, 0).normalize();
+        scene.add(directionalLight);
+
+        var ambient = new THREE.AmbientLight(0xffffff, 1); //AmbientLight,影响整个场景的光源
+        ambient.position.set(0, 0, 0);
+        scene.add(ambient);
+      }
+
+      // 初始化性能插件
+      function initStats() {
+        var stats = new Stats();
+
+        stats.domElement.style.position = 'absolute';
+        stats.domElement.style.left = '0px';
+        stats.domElement.style.top = '0px';
+
+        document.body.appendChild(stats.domElement);
+        return stats;
+      }
+
+      // 初始化渲染器
+      function initRenderer() {
+        renderer = new THREE.WebGLRenderer({
+          antialias: true
+        });
+        renderer.setSize(window.innerWidth, window.innerHeight);
+        renderer.setClearColor(0x4682B4, 1.0);
+        document.body.appendChild(renderer.domElement);
+      }
+
+      // 初始化轨迹球控件
+      function initControls() {
+        controls = new THREE.OrbitControls(camera, renderer.domElement);
+        controls.enableDamping = true;
+        controls.dampingFactor = 0.5;
+        // 视角最小距离
+        controls.minDistance = 100;
+        // 视角最远距离
+        controls.maxDistance = 5000;
+        // 最大角度
+        controls.maxPolarAngle = Math.PI / 2.2;
+      }
+
+      //创建地板
+      function createFloor() {
+        var loader = new THREE.TextureLoader();
+        loader.load("./ThreeJs/images/floor.jpg", function(texture) {
+          texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+          texture.repeat.set(10, 10);
+          var floorGeometry = new THREE.BoxGeometry(2000, 2000, 1);
+          var floorMaterial = new THREE.MeshBasicMaterial({
+            map: texture
+          });
+          floor = new THREE.Mesh(floorGeometry, floorMaterial);
+          floor.rotation.x = -Math.PI / 2;
+          scene.add(floor);
+          objects.push( floor );
+        });
+      }
+
+      // 初始化GUI
+      function initGui() {
+          options = new function () {
+              this.selectObj ='';
+              this.startMove = function() {
+                  scene.remove(floor);
+                  scene.add( gridHelper );
+                  scene.add( rollOverMesh );
+                  document.addEventListener( 'mousemove', onDocumentMouseMove, false );
+                  document.addEventListener( 'mousedown', onDocumentMouseDown, false );
+              };
+              this.endMove = function() {
+                  scene.remove(gridHelper);
+                  scene.remove(rollOverMesh);
+                  scene.add( floor );
+                  document.removeEventListener( 'mousemove', onDocumentMouseMove, false );
+                  document.removeEventListener( 'mousedown', onDocumentMouseDown, false );
+              };
+          };
+          var gui = new dat.GUI();
+          gui.domElement.style = 'position:absolute;top:50px;left:0px;height:600px';
+          gui.add(options, 'selectObj').name("选中的物体:").listen();
+          gui.add(options, 'startMove').name("进入编辑模式").listen();
+          gui.add(options, 'endMove').name("退出编辑模式:").listen();
+      }
+
+			function init() {
+        initScene();
+				initCamera();
+        initLight();
+        initStats();
+        initRenderer();
+        initControls();
+        createFloor();
+        initGui();
+
+				// roll-over helpers
+				var rollOverGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				rollOverMaterial = new THREE.MeshBasicMaterial( { color: 0x00BFFF, opacity: 0.5, transparent: true } );
+				rollOverMesh = new THREE.Mesh( rollOverGeo, rollOverMaterial );
+
+        gridHelper = new THREE.GridHelper(2000,40);
+
+				// cubes
+				cubeGeo = new THREE.BoxBufferGeometry( 50, 50, 50 );
+				cubeMaterial = new THREE.MeshLambertMaterial( { color: 0xfeb74c, map: new THREE.TextureLoader().load( './ThreeJs/images/box.png' ) } );
+        var voxel = new THREE.Mesh( cubeGeo, cubeMaterial );
+        voxel.position.set(25,25,25);
+        voxel.name = "货物$1";
+        scene.add( voxel );
+        objects.push( voxel );
+        var voxel2 = voxel.clone();
+        voxel2.position.set(225,25,25);
+        voxel2.name = "货物$2";
+        scene.add( voxel2 );
+        objects.push( voxel2 );
+        var voxel3 = voxel.clone();
+        voxel3.position.set(-225,25,25);
+        voxel3.name = "货物$3";
+        scene.add( voxel3 );
+        objects.push( voxel3 );
+
+				raycaster = new THREE.Raycaster();
+				mouse = new THREE.Vector2();
+
+				window.addEventListener( 'resize', onWindowResize, false );
+
+        //添加选中时的蒙版
+        composer = new THREE.ThreeJs_Composer(renderer, scene, camera, options, selectobject);
+
+        //添加拖动效果
+        // transformControls = new THREE.ThreeJs_Drag(camera, renderer.domElement, scene, controls);
+			}
+
+			function onWindowResize() {
+				camera.aspect = window.innerWidth / window.innerHeight;
+				camera.updateProjectionMatrix();
+				renderer.setSize( window.innerWidth, window.innerHeight );
+			}
+
+			function onDocumentMouseMove( event ) {
+				event.preventDefault();
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+					rollOverMesh.position.copy( intersect.point ).add( intersect.face.normal );
+					rollOverMesh.position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+				}
+				renderer.render(scene, camera);
+			}
+
+			function onDocumentMouseDown( event ) {
+				event.preventDefault();
+				mouse.set( ( event.clientX / window.innerWidth ) * 2 - 1, - ( event.clientY / window.innerHeight ) * 2 + 1 );
+				raycaster.setFromCamera( mouse, camera );
+				var intersects = raycaster.intersectObjects( objects );
+				if ( intersects.length > 0 ) {
+					var intersect = intersects[ 0 ];
+					selectobject[0].position.copy( intersect.point ).add( intersect.face.normal );
+					selectobject[0].position.divideScalar( 50 ).floor().multiplyScalar( 50 ).addScalar( 25 );
+					renderer.render(scene, camera);
+				}
+			}
+
+      function animate() {
+        requestAnimationFrame(animate);
+        renderer.render(scene, camera);
+        composer.render();
+        update();
+      }
+
+      // 更新控件
+      function update() {
+        stats.update();
+        controls.update();
+      }
+  </script>
+</body>
+
+</html>

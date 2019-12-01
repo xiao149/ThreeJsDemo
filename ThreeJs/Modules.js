@@ -180,6 +180,34 @@ function initMat() {
     RollTexture.wrapT=THREE.RepeatWrapping;
 }
 
+//region 放置天空盒
+function addSkybox( size,scene ) {
+    urls = [
+        './ThreeJs/images/skybox/远山_RT.jpg', // right
+        './ThreeJs/images/skybox/远山_LF.jpg', // left
+        './ThreeJs/images/skybox/远山_UP.jpg', // top
+        './ThreeJs/images/skybox/远山_DN.jpg', // bottom
+        './ThreeJs/images/skybox/远山_BK.jpg', // back
+        './ThreeJs/images/skybox/远山_FR.jpg'  // front
+    ];
+    var skyboxCubemap = new THREE.CubeTextureLoader().load( urls );
+    skyboxCubemap.format = THREE.RGBFormat;
+
+    var skyboxShader = THREE.ShaderLib['cube'];
+    skyboxShader.uniforms['tCube'].value = skyboxCubemap;
+    var obj = new THREE.Mesh(
+        new THREE.BoxGeometry( size, size, size ),
+        new THREE.ShaderMaterial({
+            fragmentShader : skyboxShader.fragmentShader,
+            vertexShader : skyboxShader.vertexShader,
+            uniforms : skyboxShader.uniforms,
+            depthWrite : false,
+            side : THREE.BackSide
+        })
+    );
+    scene.add( obj );
+}
+//endregion
 
 //region 滚动的物体
 function addRollPlane(scene) {
@@ -189,7 +217,6 @@ function addRollPlane(scene) {
     scene.add( obj );
 }
 //endregion
-
 
 //region 矩形区域
 /**  */

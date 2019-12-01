@@ -67,14 +67,12 @@
     // 初始化场景
     function initScene() {
       scene = new THREE.Scene();
-      scene.fog = new THREE.Fog(scene.background, 3000, 5000);
     }
 
     // 初始化相机
     function initCamera() {
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-      camera.position.set(0, 800, 1500);
-      camera.lookAt(new THREE.Vector3(0, 0, 0));
+      camera.position.set(50, 50, 200);
     }
 
     // 初始化灯光
@@ -315,7 +313,7 @@
       texture.format = THREE.RGBFormat;
       material.map = texture;
       var mesh = new THREE.Mesh(planeGeometry, material);
-      mesh.position.set(500, 100, -694);
+      mesh.position.set(0, 60, -690);
       scene.add(mesh);
     }
 
@@ -327,9 +325,10 @@
       // 视角最小距离
       controls.minDistance = 100;
       // 视角最远距离
-      controls.maxDistance = 5000;
+      controls.maxDistance = 1000;
       // 最大角度
       controls.maxPolarAngle = Math.PI / 2.2;
+      controls.target = new THREE.Vector3(50,50,0);
     }
 
     function initEcharts(){
@@ -448,8 +447,9 @@
 
     // 初始化
     function init() {
-      initMat();//初始化材质信息
+      initMat();
       initScene();
+      addSkybox( 10000, scene );
       initCamera();
       initRenderer();
       initContent();

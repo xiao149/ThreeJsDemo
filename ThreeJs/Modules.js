@@ -218,8 +218,24 @@ function addRollPlane(scene) {
 }
 //endregion
 
+//region 放置视频面板
+function addVideoPlane( x,y,z,width,length,scene,videoId ) {
+  var planeGeometry = new THREE.PlaneGeometry(width, length);
+  var material = new THREE.MeshPhongMaterial();
+  material.side = THREE.DoubleSide;
+  var video = document.getElementById(videoId);
+  var texture = new THREE.VideoTexture(video);
+  texture.minFilter = THREE.LinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  texture.format = THREE.RGBFormat;
+  material.map = texture;
+  var mesh = new THREE.Mesh(planeGeometry, material);
+  mesh.position.set(x,y,z);
+  scene.add(mesh);
+}
+//endregion
+
 //region 矩形区域
-/**  */
 function addPlane(x,z,width,length,scene) {
     var lineWidth = 8
     var geometry = new THREE.PlaneGeometry( lineWidth, length );

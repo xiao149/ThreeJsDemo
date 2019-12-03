@@ -49,7 +49,7 @@
   <div id="label"></div>
   <div id="container"></div>
   <video id="video" autoplay loop muted>
-    <source src="./video.mp4">
+    <source src="./video/videoPlane.mp4">
   </video>
 
   <script>
@@ -302,19 +302,6 @@
       createWindow(100, 100, 2, 0, 900, 90, 700, "窗户");
       createWindow(100, 100, 2, 0, -200, 90, 700, "窗户");
       createWindow(100, 100, 2, 0, 200, 90, 700, "窗户");
-
-      var planeGeometry = new THREE.PlaneGeometry(200, 100);
-      var material = new THREE.MeshPhongMaterial();
-      material.side = THREE.DoubleSide;
-      var video = document.getElementById('video');
-      var texture = new THREE.VideoTexture(video);
-      texture.minFilter = THREE.LinearFilter;
-      texture.magFilter = THREE.LinearFilter;
-      texture.format = THREE.RGBFormat;
-      material.map = texture;
-      var mesh = new THREE.Mesh(planeGeometry, material);
-      mesh.position.set(0, 60, -690);
-      scene.add(mesh);
     }
 
     // 初始化轨迹球控件
@@ -450,6 +437,7 @@
       initMat();
       initScene();
       addSkybox( 10000, scene );
+      addVideoPlane( 0, 60, -690, 200, 100 ,scene, 'video' );
       initCamera();
       initRenderer();
       initContent();

@@ -8,7 +8,7 @@
   <script src="./ThreeJs/TransformControls.js"></script>
   */
 
-THREE.ThreeJs_Drag = function ( _camera, _domElement, _scene, _controls) {
+THREE.ThreeJs_Drag = function ( _camera, _domElement, _scene, _controls, _isPaused) {
         // 过滤不是 Mesh 的物体,例如辅助网格
         var objects = [];
         for (var i = 0; i < _scene.children.length; i++) {
@@ -21,9 +21,11 @@ THREE.ThreeJs_Drag = function ( _camera, _domElement, _scene, _controls) {
         var dragControls = new THREE.DragControls( objects, _camera, _domElement );
 				dragControls.addEventListener( 'dragstart', function ( event ) {
             _controls.enabled = false;
+            _isPaused = true;
 				} );
 				dragControls.addEventListener( 'dragend', function ( event ) {
             _controls.enabled = true;
+            _isPaused = false;
 				} );
     // // 添加平移控件
     // var transformControls = new THREE.TransformControls(_camera, _domElement);

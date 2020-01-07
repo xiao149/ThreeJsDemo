@@ -28,6 +28,7 @@
   <script src="./ThreeJs/js/stats.min.js"></script>
   <script src="./ThreeJs/js/DragControls.js"></script>
   <script src="./ThreeJs/js/OrbitControls.js"></script>
+  <script src="./ThreeJs/js/FirstPersonControls.js"></script>
   <script src="./ThreeJs/js/TransformControls.js"></script>
   <script src="./ThreeJs/js/dat.gui.min.js"></script>
   <script src="./ThreeJs/js/EffectComposer.js"></script>
@@ -43,6 +44,7 @@
   <script src="./ThreeJs/js/Tween.js"></script>
   <script src="./ThreeJs/js/jquery-1.11.0.min.js"></script>
   <script src="./echarts/echarts.min.js"></script>
+  <script src="./ThreeJs/config.js"></script>
 </head>
 
 <body>
@@ -53,16 +55,12 @@
   </video>
 
   <script>
+
     var stats = initStats();
     var scene, camera, renderer, controls, light, composer,transformControls, options;
     var matArrayA = []; //内墙
     var matArrayB = []; //外墙
     var group = new THREE.Group();
-
-    var mouse, raycaster;
-    var rollOverMesh, rollOverMaterial;
-    var cubeGeo, cubeMaterial;
-    var objects = [];
 
     // 初始化场景
     function initScene() {
@@ -72,7 +70,7 @@
     // 初始化相机
     function initCamera() {
       camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 10000);
-      camera.position.set(50, 50, 200);
+      camera.position.set(0, 50, 200);
     }
 
     // 初始化灯光
@@ -140,7 +138,6 @@
         floor.rotation.x = -Math.PI / 2;
         floor.name = "地面";
         scene.add(floor);
-        objects.push( floor );
       });
     }
 
@@ -190,7 +187,7 @@
         doormaterial.transparent = true;
         var door = new THREE.Mesh(doorgeometry, doormaterial);
         door.position.set(x, y, z);
-        door.rotation.y += angle * Math.PI; //-逆时针旋转,+顺时针
+        door.rotation.y += angle * Math.PI; //-逆时针旋转,+顺时针8
         door.name = name;
         scene.add(door);
       });
@@ -448,23 +445,41 @@
 
       addArea(0,0,1000,500,scene,"ID1$库区1号","FF0000",20,"左对齐");
 
-      addShelf(scene, objects);
+      addShelf(scene);
 
       //添加货物
-      for(var i = 1; i <= 3; i++){
-          for(var j = 1; j <= 2; j++){
-              for(var k = 1; k <= 3; k++) {
-                  addOneUnitCargos("A" + k, i, j, scene);
+      var shelf_list = GET_SHELF_LIST();
+      for(var i = 1; i <= GET_LAYER_NUM(); i++){
+          for(var j = 1; j <= GET_COLUMN_NUM(); j++){
+              for(var k = 1; k <= shelf_list.length; k++) {
+                  addOneUnitCargos(shelf_list[k-1].shelfId, i, j, scene);
               }
           }
       }
 
-      addRollPlane(scene);
-
       //添加选中时的蒙版
       composer = new THREE.ThreeJs_Composer(renderer, scene, camera, options);
+
       //添加拖动效果
-      transformControls = new THREE.ThreeJs_Drag(camera, renderer.domElement, scene, controls);
+      // 过滤不是 Mesh 的物体,例如辅助网格
+      var objects = [];
+      for (var i = 0; i < scene.children.length; i++) {
+          var Msg =  scene.children[i].name.split("$");
+          if (scene.children[i].isMesh && Msg[0] == "货物") {
+              objects.push(scene.children[i]);
+          }
+      }
+
+      var dragControls = new THREE.DragControls( objects, camera, renderer.domElement );
+      dragControls.addEventListener( 'dragstart', function ( event ) {
+          controls.enabled = false;
+          isPaused = true;
+      } );
+      dragControls.addEventListener( 'dragend', function ( event ) {
+          controls.enabled = true;
+          isPaused = false;
+      } );
+
       document.addEventListener('resize', onWindowResize, false);
     }
 

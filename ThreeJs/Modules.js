@@ -15,15 +15,6 @@ var storageUnitSize = 0, storageUnitList = [];
 //货物信息
 var cargoSize = 0, cargoList = [], CargosExist;
 
-var PLANE_LENGTH = 24;
-var PLANE_WIDTH = 55;
-var PLANE_HEIGHT = 2;
-var HOLDER_LENGTH = 2;
-var HOLDER_WIDTH = 2;
-var HOLDER_HEIGHT = 25;
-var LAYER_NUM = 3;
-var COLUMN_NUM = 2;
-
 //创建库区对象
 function storageZone(StorageZoneId,StorageZoneName,
                      coordinateX,coordinateZ,
@@ -304,14 +295,14 @@ function addArea(x,z,width,length,scene,name,textColor,font_size,textposition) {
 /** plane_x,plane_y,plane_z 货架板面的长高宽 */
 /** holder_x,holder_y,holder_z 货架支架的长高宽 */
 /** scene,name,num 要添加的场景,货架的名字,单层货架的库位数量 */
-function addRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name,num,objects) {
+function addRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name,num) {
     var plane = new THREE.BoxGeometry( plane_x, plane_y, plane_z/num );
     var gz = [];
     for(var i = 0; i < num; i++){
         gz.push( z + plane_z/num/2 + (plane_z/num)*i );
         var obj = new THREE.Mesh( plane, RackMat );
         obj.position.set(x , y, gz[i]) ;
-        var msg = name+"$"+(2-i);
+        var msg = name+"$"+(GET_COLUMN_NUM() - i);
 
         var storageUnitId = msg.split("$")[1] + "$" + msg.split("$")[3] + "$" + msg.split("$")[4];
 
@@ -328,14 +319,13 @@ function addRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,
         var Unit = getStorageUnitById(msg.split("$")[1],msg.split("$")[3],msg.split("$")[4]);
         obj.name = "货位"+"$"+Unit.storageUnitId;
         scene.add(obj);
-        objects.push( obj );
     }
 
     var holder = new THREE.BoxGeometry( holder_x, holder_y, holder_z );
-    var obj2 = new THREE.Mesh( holder, RackMat2 );
-    var obj3 = new THREE.Mesh( holder, RackMat2 );
-    var obj4 = new THREE.Mesh( holder, RackMat2 );
-    var obj5 = new THREE.Mesh( holder, RackMat2 );
+    var obj2 = new THREE.Mesh( holder, RackMat2, 0 );
+    var obj3 = new THREE.Mesh( holder, RackMat2, 0 );
+    var obj4 = new THREE.Mesh( holder, RackMat2, 0 );
+    var obj5 = new THREE.Mesh( holder, RackMat2, 0 );
 
     obj2.position.set(x-plane_x/2+holder_x/2,y-holder_y/2-plane_y/2,z+holder_z/2);
     obj3.position.set(x+plane_x/2-holder_x/2,y-holder_y/2-plane_y/2,z+holder_z/2);
@@ -346,34 +336,31 @@ function addRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,
 
 /** 放置一叠货架 */
 /** stack_num 货架的叠数 */
-function addStackOfRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name,num,stack_num,objects) {
+function addStackOfRack(x,y,z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name,num,stack_num) {
     for(var i = 0; i < stack_num; i++){
-        addRack(x,y*(i+1),z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name+"$"+(i+1),num,objects);
+        addRack(x,y*(i+1),z,plane_x,plane_y,plane_z,holder_x,holder_y,holder_z,scene,name+"$"+(i+1),num);
     }
 }
 
 /** 根据3D库图货架配置表添加货架 */
-function addShelf(scene, objects) {
-    var shelf_list = new Array();
-    shelf_list.push({StorageZoneId:'Z1',shelfId:'A1',shelfName:'货架A1',x:-100,y:27,z:0});
-    shelf_list.push({StorageZoneId:'Z1',shelfId:'A2',shelfName:'货架A2',x:0,y:27,z:0});
-    shelf_list.push({StorageZoneId:'Z1',shelfId:'A3',shelfName:'货架A3',x:100,y:27,z:0});
+function addShelf(scene) {
+    var shelf_list = GET_SHELF_LIST();
     shelfSize = shelf_list.length;
     for(var i = 0; i < shelfSize; i++){
         var shelf_obj = new shelf(shelf_list[i].StorageZoneId,
             shelf_list[i].shelfId,
             shelf_list[i].shelfName,
-            PLANE_LENGTH,PLANE_WIDTH,PLANE_HEIGHT,
-            HOLDER_LENGTH,HOLDER_WIDTH,HOLDER_HEIGHT,
+            GET_PLANE_LENGTH(),GET_PLANE_WIDTH(),GET_PLANE_HEIGHT(),
+            GET_HOLDER_LENGTH(),GET_HOLDER_WIDTH(),GET_HOLDER_HEIGHT(),
             shelf_list[i].x,
             shelf_list[i].y,
             shelf_list[i].z,
-            LAYER_NUM,COLUMN_NUM);
+            GET_LAYER_NUM(),GET_COLUMN_NUM());
         shelfList.push(shelf_obj);
     }
 
     for(var i = 0;i < shelfSize; i++){
-        addStackOfRack(shelfList[i].positionX,shelfList[i].positionY,shelfList[i].positionZ,shelfList[i].planeLength,shelfList[i].planeHeight,shelfList[i].planeWidth,shelfList[i].holderLength,shelfList[i].holderHeight,shelfList[i].holderWidth,scene,shelfList[i].storageZoneId+"$"+shelfList[i].shelfId+"$"+shelfList[i].shelfName,shelfList[i].columnNum,shelfList[i].layerNum, objects);
+        addStackOfRack(shelfList[i].positionX,shelfList[i].positionY,shelfList[i].positionZ,shelfList[i].planeLength,shelfList[i].planeHeight,shelfList[i].planeWidth,shelfList[i].holderLength,shelfList[i].holderHeight,shelfList[i].holderWidth,scene,shelfList[i].storageZoneId+"$"+shelfList[i].shelfId+"$"+shelfList[i].shelfName,shelfList[i].columnNum,shelfList[i].layerNum);
     }
 }
 
@@ -393,8 +380,8 @@ function addOneUnitCargos(shelfId,inLayerNum,inColumnNum,scene) {
     var shelf = getShelfById(storageUnit.shelfId);
     var storageUnitid = storageUnit.storageUnitId;
     var x = storageUnit.positionX;
-    var y = storageUnit.positionY + 8 + shelf.planeHeight/2;
+    var y = storageUnit.positionY + GET_BOX_SIZE()/2 + shelf.planeHeight/2;
     var z = storageUnit.positionZ;
-    addCargo(x,y,z,16,16,16,scene,"货物"+"$"+storageUnitid)
+    addCargo(x,y,z,GET_BOX_SIZE(),GET_BOX_SIZE(),GET_BOX_SIZE(),scene,"货物"+"$"+storageUnitid)
 }
 //endregion
